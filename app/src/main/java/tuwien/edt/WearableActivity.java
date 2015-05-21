@@ -16,6 +16,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.parse.Parse;
+import com.parse.ParseObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,12 +48,14 @@ public class WearableActivity extends Activity implements
 
     private TextView mTextView;
 
+    private ParseObject testObject = new ParseObject("TestObject");
     /**
      * Called when the activity is starting. Restores the activity state.
      */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wearable);
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
@@ -61,8 +65,10 @@ public class WearableActivity extends Activity implements
                 mTextView = (TextView) stub.findViewById(R.id.text);
             }
         });
+        // Enable Local Datastore.
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "H7l1EZ6aoMIkNcgJrh7ZRZL0kNRtqwmtBamrtm7d", "EkRor8syu9CaXpx2qP3lKaTnJrYCE6QWchp7Yzxm");
     }
-
 
     /**
      * Called when the Activity is made visible.
@@ -201,5 +207,9 @@ public class WearableActivity extends Activity implements
         // Display latitude in UI in default wearable text view
         mTextView.setText("Latitude:  " + String.valueOf( location.getLatitude()) +
                 "\nLongitude:  " + String.valueOf( location.getLongitude()));
+
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
+        Log.v("myMsg","PARSE DONE");
     }
 }

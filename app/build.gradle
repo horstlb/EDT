@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "tuwien.edt"
-        minSdkVersion 20
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -21,11 +21,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
     //compile 'com.google.android.support:wearable:1.1.0'
     //compile 'com.google.android.gms:play-services-wearable:7.0.0'
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile fileTree(dir: 'libs', include: 'Parse-*.jar')
 
     compile 'com.google.android.support:wearable:1.1.0'
     compile 'com.google.android.gms:play-services-wearable:6.5.+'
     compile 'com.google.android.gms:play-services-location:6.5.+'
+
 }

@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">EDT</string>
-    <string name="hello_round">Hello Round World!</string>
-    <string name="hello_square">Hello Square World!</string>
+    <string name="hello_round">No GPS Data yet!</string>
+    <string name="hello_square">No GPS Data yet!</string>
 </resources>
