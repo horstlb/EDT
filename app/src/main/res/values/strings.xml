@@ -2,4 +2,12 @@
     <string name="app_name">EDT</string>
     <string name="hello_round">No GPS Data yet!</string>
     <string name="hello_square">No GPS Data yet!</string>
+    <string name="move_square">No Movement yet!</string>
+    <string name="move_round">No Movement yet!</string>
+    <string name="conf_posmsg">Treffer! Deinem Gegner hat das letzte Stündlein geschlagen!</string>
+    <string name="gameInfo">Du wurdest noch nicht herausgefordert...</string>
+    <string name="attackInfo">Mach dich bereit!</string>
+    <string name="attackInstruction">Waagrecht...</string>
+    <string name="attackMsg">Achte auf die Vibration und ziehe deine Waffe so schnell du kannst!</string>
+    <string name="conf_posmsgfailure">Du wurdest gerade über den Haufen geschossen!</string>
 </resources>

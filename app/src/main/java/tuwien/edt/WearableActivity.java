@@ -4,10 +4,19 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
+import android.view.Display;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -16,8 +25,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.parse.Parse;
-import com.parse.ParseObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +33,22 @@ public class WearableActivity extends Activity implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
+    private float mLastX, mLastY, mLastZ;
+    private boolean mInitialized;
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private float mSensorX;
+    private float mSensorY;
+    private Display mDisplay;
+    private SensorManager sm;
+    private PowerManager mPowerManager;
+    private WindowManager mWindowManager;
+    private float dist = 40;
+
     private static final String TAG = "WearableActivity";
 
     private static final String KEY_IN_RESOLUTION = "is_in_resolution";
+    public static boolean attack = false;
 
     /**
      * Request code for auto Google Play Services error resolution.
@@ -45,10 +65,15 @@ public class WearableActivity extends Activity implements
      * waiting for resolution intent to return.
      */
     private boolean mIsInResolution;
-
+    public static TextView scoreBox;
+    public static TextView scoreLost;
     private TextView mTextView;
-
-    private ParseObject testObject = new ParseObject("TestObject");
+    TextView moveTextView;
+    TextView gameInfo;
+    ImageButton okBtn;
+    ImageButton cancelBtn;
+    ImageView statIcon;
+    //private ParseObject testObject = new ParseObject("TestObject");
     /**
      * Called when the activity is starting. Restores the activity state.
      */
@@ -58,16 +83,28 @@ public class WearableActivity extends Activity implements
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wearable);
+
+
+        // Enable Local Datastore.
+        //Parse.enableLocalDatastore(this);
+        //Parse.initialize(this, "H7l1EZ6aoMIkNcgJrh7ZRZL0kNRtqwmtBamrtm7d", "EkRor8syu9CaXpx2qP3lKaTnJrYCE6QWchp7Yzxm");
+
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
                 mTextView = (TextView) stub.findViewById(R.id.text);
+                moveTextView = (TextView) stub.findViewById(R.id.moveTextView);
+                okBtn = (ImageButton) stub.findViewById(R.id.okBtn);
+                cancelBtn = (ImageButton) stub.findViewById(R.id.cancelBtn);
+                statIcon = (ImageView) stub.findViewById(R.id.statIcon);
+                gameInfo = (TextView) stub.findViewById(R.id.gameInfo);
+                scoreBox = (TextView) findViewById(R.id.scoreBox);
+                scoreLost = (TextView) findViewById(R.id.scoreLost);
             }
         });
-        // Enable Local Datastore.
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "H7l1EZ6aoMIkNcgJrh7ZRZL0kNRtqwmtBamrtm7d", "EkRor8syu9CaXpx2qP3lKaTnJrYCE6QWchp7Yzxm");
+
+
     }
 
     /**
@@ -110,6 +147,8 @@ public class WearableActivity extends Activity implements
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_IN_RESOLUTION, mIsInResolution);
     }
+
+
 
     /**
      * Handles Google Play Services resolution callbacks.
@@ -199,7 +238,6 @@ public class WearableActivity extends Activity implements
 
     @Override
     public void onLocationChanged(Location location){
-
         // Log the output for debugging
         Log.v("myTag", "Latitude: " + location.getLatitude() +
                 ", Longitude: " + location.getLongitude());
@@ -207,9 +245,76 @@ public class WearableActivity extends Activity implements
         // Display latitude in UI in default wearable text view
         mTextView.setText("Latitude:  " + String.valueOf( location.getLatitude()) +
                 "\nLongitude:  " + String.valueOf( location.getLongitude()));
+        moveTextView.setText("Movement!");
+        checkMarkers(location);
 
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-        Log.v("myMsg","PARSE DONE");
+    }
+
+    public void checkMarkers(Location location){
+        float[] results = new float[1];
+        boolean attackflag=false;
+        double[] markerLat = new double[]{48.1831911,48.197791,48.198595,48.199056,48.199547,48.1980481};
+        double[] markerLon = new double[]{15.6284965,16.371509,16.371635,16.369964,16.371153,16.3688539};
+        //Zuhause, Seminarraum Argentinierstr.,vor der Karlskirche,Haupteingang TU,Denkmal J. Madersberger, Lernraum Paniglgasse
+
+        for(int i=0; i<markerLat.length;i++) {
+            Location.distanceBetween(markerLat[i], markerLon[i],
+                    location.getLatitude(), location.getLongitude(), results);
+            Log.v("Distance to Marker", String.valueOf(results[0]));
+            if(results[0]< dist && attack == false){
+                attackflag=true;
+            }
+        }
+
+        //moveTextView.setText(String.valueOf(mSensorX));
+        if(attackflag){
+            gameInfo.setVisibility(View.GONE);
+            attack = true;
+            vibrateWatch();
+            WearableActivity.scoreBox.setVisibility(View.GONE);
+            WearableActivity.scoreLost.setVisibility(View.GONE);
+            okBtn.setVisibility(View.VISIBLE);
+            cancelBtn.setVisibility(View.VISIBLE);
+            statIcon.setImageResource(R.drawable.evil);
+            //finish();
+        }
+    }
+    public Boolean getAttackState() {
+        return attack;
+    }
+
+    public static void setAttackState(Boolean newState) {
+        attack = newState;
+    }
+    public void vibrateWatch(){
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        long[] vibrationPattern = {0, 500, 50, 300};
+        //-1 - don't repeat
+        final int indexInPatternToRepeat = -1;
+        vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+    }
+    public void defendAttack(View v){
+        startActivity(new Intent(WearableActivity.this, MyApplication.class));
+        statIcon.setImageResource(R.drawable.cool);
+        okBtn.setVisibility(View.INVISIBLE);
+        cancelBtn.setVisibility(View.INVISIBLE);
+
+    }
+    public void cancelAttack(View v){
+        attack = false;
+        statIcon.setImageResource(R.drawable.cool);
+        okBtn.setVisibility(View.INVISIBLE);
+        cancelBtn.setVisibility(View.INVISIBLE);
+        gameInfo.setVisibility(View.VISIBLE);
+    }
+    public void simulateAttack(View v){
+        attack = true;
+        vibrateWatch();
+        WearableActivity.scoreBox.setVisibility(View.GONE);
+        WearableActivity.scoreLost.setVisibility(View.GONE);
+        gameInfo.setVisibility(View.GONE);
+        okBtn.setVisibility(View.VISIBLE);
+        cancelBtn.setVisibility(View.VISIBLE);
+        statIcon.setImageResource(R.drawable.evil);
     }
 }

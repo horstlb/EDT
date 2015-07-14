@@ -2,8 +2,96 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:orientation="vertical"
-    tools:context=".WearableActivity" tools:deviceIds="wear_square">
+    tools:context=".WearableActivity" tools:deviceIds="wear_square"
+    android:weightSum="1">
+
+    <ImageView
+        android:layout_width="124dp"
+        android:layout_height="108dp"
+        android:id="@+id/statIcon"
+        android:src="@drawable/cool"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible"
+        android:onClick="simulateAttack" />
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/white">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="0"
+            android:id="@+id/scoreBox"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="20dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="0"
+            android:id="@+id/scoreLost"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/black"
+            android:layout_marginRight="20dp" />
+    </TableRow>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/gameInfo"
+        android:id="@+id/gameInfo"
+        android:textSize="15dp"
+        android:background="@color/white"
+        android:textColor="@color/black"
+        android:layout_marginTop="20dp" />
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <ImageButton
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/okBtn"
+            android:src="@drawable/ok"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center_horizontal|left"
+            android:visibility="invisible"
+            android:onClick="defendAttack" />
+
+        <ImageButton
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/cancelBtn"
+            android:src="@drawable/cancel"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            android:onClick="cancelAttack" />
+    </TableRow>
 
     <TextView android:id="@+id/text" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:text="@string/hello_square" />
+        android:layout_height="wrap_content" android:text="@string/hello_square"
+        android:layout_weight="0.21"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/moveTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/move_square"
+        android:visibility="invisible" />
+
 </LinearLayout>
